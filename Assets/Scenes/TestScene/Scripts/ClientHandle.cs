@@ -93,6 +93,19 @@ public class ClientHandle : MonoBehaviour
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
+
+        bool _resquested = _buffer.ReadBool();
+
+        if(_resquested == true) // We requested user information.
+        {
+            string _friendPlayFabID = _buffer.ReadString();
+            string _friendPlayFabNetworkID = _buffer.ReadString();
+
+            print($"The requested friend with ID: {_friendPlayFabID} is currently online? {_resquested}");
+            _buffer.Dispose();
+            return;
+        }
+
         string _msg = _buffer.ReadString();
         int _myPlayerID = _buffer.ReadInt();
         _buffer.Dispose();
