@@ -90,18 +90,32 @@ public class ClientHandle : MonoBehaviour
 
     private static void HandShake(byte[] _data)
     {
+        string _response = string.Empty;
+        bool _status = false;
+        string _friendPlayFabID;
+        string _friendPlayFabNetworkID;
+
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
 
         bool _resquested = _buffer.ReadBool();
 
-        if(_resquested == true) // We requested user information.
+        if (_resquested == true) // We requested user information.
         {
-            string _friendPlayFabID = _buffer.ReadString();
-            string _friendPlayFabNetworkID = _buffer.ReadString();
+            _status = _buffer.ReadBool();
+            _friendPlayFabID = _buffer.ReadString();
+            if (_status == true)
+            {
+                //User is online.
+                _friendPlayFabNetworkID = _buffer.ReadString();
+                _response = $"User: {_friendPlayFabID} Online Status: {_status} Network ID: {_friendPlayFabNetworkID}";
+            } else
+            {
+                _response = $"User: {_friendPlayFabID} Online Status: {_status}";
+            }
 
-            print($"The requested friend with ID: {_friendPlayFabID} is currently online? {_resquested}");
+            print($"Debug: {_response}");
             _buffer.Dispose();
             return;
         }
