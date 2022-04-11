@@ -47,7 +47,7 @@ public class ClientSend : MonoBehaviour
         ByteBuffer _buffer = new ByteBuffer(); 
         _buffer.WriteInt((int)ClientPackets.HandShakeReceived);
 
-        _buffer.WriteBool(false);
+        //_buffer.WriteBool(false);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabDisplayName);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabID);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabNetworkID);
@@ -59,9 +59,9 @@ public class ClientSend : MonoBehaviour
     public void GetFriendOnlineStatus()
     {
         ByteBuffer _buffer = new ByteBuffer();
-        _buffer.WriteInt((int)ClientPackets.HandShakeReceived);
+        _buffer.WriteInt((int)ClientPackets.UserInfoRequestReceived);
 
-        _buffer.WriteBool(true);
+        //_buffer.WriteBool(true);
         _buffer.WriteString(FriendPlayFabID);
 
         SendDataToServer(_buffer.ToArray());

@@ -375,7 +375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <IP>k__BackingField: 127.0.0.1
   <Port>k__BackingField: 16320
-  <UserID>k__BackingField: 0
+  <UserID>k__BackingField: 1
 --- !u!114 &729446292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,7 +400,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d010183d9a9d740a939bca48f2e44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <FriendPlayFabID>k__BackingField: 
+  <FriendPlayFabID>k__BackingField: 123
 --- !u!114 &729446294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,8 +413,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afba536c98416144d8bbc3c74399572c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PlayFabDisplayName>k__BackingField: Rumpel
-  <PlayFabID>k__BackingField: TestID
+  <PlayFabDisplayName>k__BackingField: Rumpel2
+  <PlayFabID>k__BackingField: 1234
   <PlayFabNetworkID>k__BackingField: 129378-128DHJF12387DJKF
 --- !u!1 &802901794
 GameObject:

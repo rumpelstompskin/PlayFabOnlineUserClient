@@ -24,7 +24,8 @@ public class ClientHandle : MonoBehaviour
         Debug.Log("Initializing packets...");
         packets = new Dictionary<int, Packet>
         {
-            { (int)ServerPackets.HandShake, HandShake }
+            { (int)ServerPackets.HandShake, HandShake },
+            { (int)ServerPackets.UserInfoRequest, UserInfoReceived }
         };
     }
 
@@ -88,7 +89,21 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
-    private static void HandShake(byte[] _data)
+    private static void HandShake(byte[] _data) // Initial handshake. Tells the client it has successfully connected.
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteBytes(_data);
+        _buffer.ReadInt();
+
+        string _msg = _buffer.ReadString();
+        int _myPlayerID = _buffer.ReadInt();
+        _buffer.Dispose();
+        Debug.Log("Message from server: " + _msg);
+        ClientTCP.Instance.UserID = _myPlayerID;
+        ClientSend.Instance.HandShakeReceived();
+    }
+
+    public static void UserInfoReceived(byte[] _data)
     {
         string _response = string.Empty;
         bool _status = false;
@@ -99,32 +114,21 @@ public class ClientHandle : MonoBehaviour
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
 
-        bool _resquested = _buffer.ReadBool();
-
-        if (_resquested == true) // We requested user information.
+        _status = _buffer.ReadBool();
+        _friendPlayFabID = _buffer.ReadString();
+        if (_status == true)
         {
-            _status = _buffer.ReadBool();
-            _friendPlayFabID = _buffer.ReadString();
-            if (_status == true)
-            {
-                //User is online.
-                _friendPlayFabNetworkID = _buffer.ReadString();
-                _response = $"User: {_friendPlayFabID} Online Status: {_status} Network ID: {_friendPlayFabNetworkID}";
-            } else
-            {
-                _response = $"User: {_friendPlayFabID} Online Status: {_status}";
-            }
-
-            print($"Debug: {_response}");
-            _buffer.Dispose();
-            return;
+            //User is online.
+            _friendPlayFabNetworkID = _buffer.ReadString();
+            _response = $"User: {_friendPlayFabID} Online Status: {_status} Network ID: {_friendPlayFabNetworkID}";
+        }
+        else
+        {
+            _response = $"User: {_friendPlayFabID} Online Status: {_status}";
         }
 
-        string _msg = _buffer.ReadString();
-        int _myPlayerID = _buffer.ReadInt();
+        print($"Debug: {_response}");
         _buffer.Dispose();
-        Debug.Log("Message from server: " + _msg);
-        ClientTCP.Instance.UserID = _myPlayerID;
-        ClientSend.Instance.HandShakeReceived();
+
     }
 }
