@@ -9,6 +9,9 @@ public class ClientSend : MonoBehaviour
 {
     public static ClientSend Instance;
 
+    [field: SerializeField, Tooltip("Friend PlayFab ID used to request status")]
+    public string FriendPlayFabID { get; set; } = default;
+
     private void Awake()
     {
         if (Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }
@@ -33,14 +36,33 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// This is where the information is sent to the server. 
+    /// If we want to send other data. 
+    /// We can make a method similar to this one.
+    /// </summary>
+
     public void HandShakeReceived()
     {
-        ByteBuffer _buffer = new ByteBuffer();
+        ByteBuffer _buffer = new ByteBuffer(); 
         _buffer.WriteInt((int)ClientPackets.HandShakeReceived);
 
+        //_buffer.WriteBool(false);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabDisplayName);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabID);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabNetworkID);
+
+        SendDataToServer(_buffer.ToArray());
+        _buffer.Dispose();
+    }
+
+    public void GetFriendOnlineStatus()
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteInt((int)ClientPackets.UserInfoRequestReceived);
+
+        //_buffer.WriteBool(true);
+        _buffer.WriteString(FriendPlayFabID);
 
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
