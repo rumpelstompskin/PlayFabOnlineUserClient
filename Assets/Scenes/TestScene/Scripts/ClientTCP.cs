@@ -57,7 +57,7 @@ public class ClientTCP : MonoBehaviour
     {
         socket.EndConnect(_result);
 
-        if (!socket.Connected) { return; }
+        if (!socket.Connected) { return; } // TODO Return error to the user.
 
         else
         {
