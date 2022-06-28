@@ -67,4 +67,15 @@ public class ClientSend : MonoBehaviour
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }
+
+    public void AuthorizeClient()
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteInt((int)ClientPackets.AuthorizeClientReceived);
+
+        _buffer.WriteString(ClientTCP.Instance.ServiceAuthorizationKey);
+
+        SendDataToServer(_buffer.ToArray());
+        _buffer.Dispose();
+    }
 }

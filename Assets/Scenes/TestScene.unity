@@ -205,7 +205,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 348583296}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 729446293}
+        m_TargetAssemblyTypeName: ClientSend, Assembly-CSharp
+        m_MethodName: AuthorizeClient
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &348583296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,6 +385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1fc00b95892f549a147a6c94c8cc40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ServiceAuthorizationKey>k__BackingField: Authorization Test Key
   <IP>k__BackingField: 127.0.0.1
   <Port>k__BackingField: 16320
   <UserID>k__BackingField: 1
@@ -639,9 +652,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aca0a5bda06332c4682e6a631d10ba54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <IP>k__BackingField: 127.0.0.1
-  <Port>k__BackingField: 26950
-  <LocalID>k__BackingField: 0
 --- !u!1 &1764064453
 GameObject:
   m_ObjectHideFlags: 0

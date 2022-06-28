@@ -25,7 +25,8 @@ public class ClientHandle : MonoBehaviour
         packets = new Dictionary<int, Packet>
         {
             { (int)ServerPackets.HandShake, HandShake },
-            { (int)ServerPackets.UserInfoRequest, UserInfoReceived }
+            { (int)ServerPackets.UserInfoRequest, UserInfoReceived },
+            { (int)ServerPackets.AuthorizeClient, AuthorizationRequested }
         };
     }
 
@@ -77,7 +78,7 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
-    private void HandlePackets(byte[] _data)
+    private void HandlePackets(byte[] _data) // Reads the id of the packet and calls the dictionary.
     {
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
@@ -101,6 +102,7 @@ public class ClientHandle : MonoBehaviour
         Debug.Log("Message from server: " + _msg);
         ClientTCP.Instance.UserID = _myPlayerID;
         ClientSend.Instance.HandShakeReceived();
+        //ClientSend.Instance.AuthorizeClient();
     }
 
     public static void UserInfoReceived(byte[] _data)
@@ -130,5 +132,17 @@ public class ClientHandle : MonoBehaviour
         print($"Debug: {_response}");
         _buffer.Dispose();
 
+    }
+
+    public static void AuthorizationRequested(byte[] _data)
+    {
+
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteBytes(_data);
+        _buffer.ReadInt();
+        ClientSend.Instance.AuthorizeClient();
+        _buffer.Dispose();
+        //ClientSend.Instance.HandShakeReceived();
+        //print("Client is authorized...");
     }
 }

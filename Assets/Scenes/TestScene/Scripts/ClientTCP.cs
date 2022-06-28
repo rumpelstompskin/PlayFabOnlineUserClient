@@ -10,6 +10,9 @@ public class ClientTCP : MonoBehaviour
 {
     public static ClientTCP Instance;
 
+    [field: SerializeField, Tooltip("Service Authorization Key"), Header("Service Configuration")]
+    public string ServiceAuthorizationKey { get; private set; } = default;
+
     [field: SerializeField, Tooltip("IP Address of server"), Header("Client Configuration")]
     public string IP { get; private set; } = default;
 
