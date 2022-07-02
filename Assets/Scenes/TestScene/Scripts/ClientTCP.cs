@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 [RequireComponent(typeof(ClientSend))][RequireComponent(typeof(ClientHandle))][RequireComponent(typeof(PlayFabSample))]
@@ -24,6 +26,7 @@ public class ClientTCP : MonoBehaviour
 
     public TcpClient socket;
     public NetworkStream stream;
+    public SslStream sslStream;
     private byte[] receiveBuffer;
 
     private void Awake()
@@ -60,28 +63,36 @@ public class ClientTCP : MonoBehaviour
     {
         socket.EndConnect(_result);
 
-        if (!socket.Connected) { return; } // TODO Return error to the user.
+        if (!socket.Connected) { print("Service offline..."); return; } // TODO Return error to the user.
 
         else
         {
             socket.NoDelay = true;
             stream = socket.GetStream();
-            stream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize, ReceivedData, null);
+            sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
+
+            sslStream.AuthenticateAsClient($"Player{PlayFabSample.Instance.PlayFabID}");
+
+            sslStream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize, ReceivedData, null);
         }
+    }
+    static bool CertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    {
+        return true;
     }
 
     private void ReceivedData(IAsyncResult _result)
     {
         try
         {
-            int _byteLenght = stream.EndRead(_result);
+            int _byteLenght = sslStream.EndRead(_result);
             if (_byteLenght <= 0) { CloseConnection(); return; }
 
             byte[] _tempBuffer = new byte[_byteLenght];
             Array.Copy(receiveBuffer, _tempBuffer, _byteLenght);
 
             ClientHandle.Instance.HandleData(_tempBuffer);
-            stream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize,
+            sslStream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize,
                 ReceivedData, null);
         }
         catch (Exception _ex)
@@ -94,6 +105,8 @@ public class ClientTCP : MonoBehaviour
 
     private void CloseConnection()
     {
+        sslStream.Close();
+        stream.Close();
         socket.Close();
     }
 }

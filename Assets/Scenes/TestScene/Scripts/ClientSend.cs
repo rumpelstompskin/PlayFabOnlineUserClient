@@ -26,7 +26,7 @@ public class ClientSend : MonoBehaviour
                 ByteBuffer _buffer = new ByteBuffer();
                 _buffer.WriteInt(_data.GetUpperBound(0) - _data.GetLowerBound(0) + 1);
                 _buffer.WriteBytes(_data);
-                ClientTCP.Instance.stream.BeginWrite(_buffer.ToArray(), 0, _buffer.ToArray().Length, null, null);
+                ClientTCP.Instance.sslStream.BeginWrite(_buffer.ToArray(), 0, _buffer.ToArray().Length, null, null);
                 _buffer.Dispose();
             }
         }
