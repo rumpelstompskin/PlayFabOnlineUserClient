@@ -61,7 +61,15 @@ public class ClientTCP : MonoBehaviour
 
     private void ConnectCallBack(IAsyncResult _result)
     {
-        socket.EndConnect(_result);
+        try
+        {
+            socket.EndConnect(_result);
+        }
+        catch(Exception e)
+        {
+            print(e.ToString());
+        }
+        
 
         if (!socket.Connected) { print("Service offline..."); return; } // TODO Return error to the user.
 
@@ -69,16 +77,31 @@ public class ClientTCP : MonoBehaviour
         {
             socket.NoDelay = true;
             stream = socket.GetStream();
-            sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
+            sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CertificateValidationCallback), null);
 
-            sslStream.AuthenticateAsClient($"Player{PlayFabSample.Instance.PlayFabID}");
+            sslStream.AuthenticateAsClient("localhost"); // TODO Change to proper name
 
             sslStream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize, ReceivedData, null);
         }
     }
-    static bool CertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    static bool CertificateValidationCallback(object sender, 
+        X509Certificate certificate, X509Chain chain, 
+        SslPolicyErrors sslPolicyErrors)
     {
-        return true;
+        if(sslPolicyErrors == SslPolicyErrors.None)
+            return true;
+
+        if(chain.ChainStatus.Length == 1)
+            if(sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors || certificate.Subject == certificate.Issuer)
+            {
+                if (chain.ChainStatus[0].Status == X509ChainStatusFlags.UntrustedRoot)
+                {
+                    return true;
+                }
+            }
+
+        print($"Certificate error: {sslPolicyErrors}");
+        return false;
     }
 
     private void ReceivedData(IAsyncResult _result)
@@ -105,8 +128,12 @@ public class ClientTCP : MonoBehaviour
 
     private void CloseConnection()
     {
+        print("Connection was terminated...");
+        if(sslStream != null)
         sslStream.Close();
+        if(stream != null)
         stream.Close();
+        if(socket != null)
         socket.Close();
     }
 }
