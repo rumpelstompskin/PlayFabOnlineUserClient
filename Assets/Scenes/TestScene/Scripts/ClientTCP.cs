@@ -78,8 +78,8 @@ public class ClientTCP : MonoBehaviour
             socket.NoDelay = true;
             stream = socket.GetStream();
             sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CertificateValidationCallback), null);
-
-            sslStream.AuthenticateAsClient("localhost"); // TODO Change to proper name
+            
+            sslStream.AuthenticateAsClient(PlayFabSample.Instance.ServerName); // TODO Change to proper name
 
             sslStream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize, ReceivedData, null);
         }
@@ -90,7 +90,7 @@ public class ClientTCP : MonoBehaviour
     {
         if(sslPolicyErrors == SslPolicyErrors.None)
             return true;
-
+        
         if(chain.ChainStatus.Length == 1)
             if(sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors || certificate.Subject == certificate.Issuer)
             {
