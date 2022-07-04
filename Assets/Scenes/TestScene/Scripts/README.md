@@ -28,6 +28,7 @@ Information stored on the server is anonymous and is deleted once the user disco
 * Move project files into a folder of your unity project.
 * Create an empty game object and drag Client TCP on it. The remaining scripts will be added at the same time.
 * Currently, the software is using PlayFabSample.cs as a placeholder. Replace those with data from PlayFab.
+* They can be found at line 51,52,53 of ClientSend.cs
 * Run the application.
 
 ## Help
