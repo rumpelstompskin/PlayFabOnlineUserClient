@@ -427,7 +427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <PlayFabDisplayName>k__BackingField: Rumpel2
-  <PlayFabID>k__BackingField: 123
+  <PlayFabID>k__BackingField: 1234
   <PlayFabNetworkID>k__BackingField: 129378-128DHJF12387DJKF
 --- !u!1 &802901794
 GameObject:
