@@ -21,6 +21,9 @@ public class PlayFabSample : MonoBehaviour
     [field: SerializeField, Tooltip("List of all the friends of the user")]
     public List<string> FriendsPlayFabIDs { get; set; } = new List<string>();
 
+    [field: SerializeField, Tooltip("List of all online friends of the user")]
+    public List<string> OnlineFriends { get; set; } = new List<string>();
+
     private void Awake()
     {
         if(Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }

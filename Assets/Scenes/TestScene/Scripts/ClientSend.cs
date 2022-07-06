@@ -55,7 +55,7 @@ public class ClientSend : MonoBehaviour
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }
-
+    /*
     public void GetFriendOnlineStatus()
     {
         ByteBuffer _buffer = new ByteBuffer();
@@ -67,7 +67,7 @@ public class ClientSend : MonoBehaviour
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }
-
+    */
     public void GetMultiUserOnlineStatus()
     {
         ByteBuffer _buffer = new ByteBuffer();

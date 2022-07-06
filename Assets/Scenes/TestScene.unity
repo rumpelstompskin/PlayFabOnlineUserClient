@@ -427,9 +427,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <PlayFabDisplayName>k__BackingField: Rumpel2
-  <PlayFabID>k__BackingField: 1234
+  <PlayFabID>k__BackingField: 12345
   <PlayFabNetworkID>k__BackingField: 129378-128DHJF12387DJKF
-  <ServerCertName>k__BackingField: service.metagamez.net
+  <ServerName>k__BackingField: 
+  <FriendsPlayFabIDs>k__BackingField:
+  - 123
+  - 1234
+  - 12345
+  <OnlineFriends>k__BackingField: []
 --- !u!1 &802901794
 GameObject:
   m_ObjectHideFlags: 0
@@ -738,7 +743,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 729446293}
         m_TargetAssemblyTypeName: ClientSend, Assembly-CSharp
-        m_MethodName: GetFriendOnlineStatus
+        m_MethodName: GetMultiUserOnlineStatus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

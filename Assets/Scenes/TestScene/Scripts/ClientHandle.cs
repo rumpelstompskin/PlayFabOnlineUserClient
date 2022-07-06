@@ -25,7 +25,7 @@ public class ClientHandle : MonoBehaviour
         packets = new Dictionary<int, Packet>
         {
             { (int)ServerPackets.HandShake, HandShake },
-            { (int)ServerPackets.UserInfoRequest, UserInfoReceived },
+            { (int)ServerPackets.UserInfoRequest, MultiUserInfoReceived },
             { (int)ServerPackets.AuthorizeClient, AuthorizationRequested }
         };
     }
@@ -104,7 +104,7 @@ public class ClientHandle : MonoBehaviour
         ClientSend.Instance.HandShakeReceived();
         //ClientSend.Instance.AuthorizeClient();
     }
-
+    /*
     public static void UserInfoReceived(byte[] _data)
     {
         string _response = string.Empty;
@@ -132,7 +132,7 @@ public class ClientHandle : MonoBehaviour
         print($"Debug: {_response}");
         _buffer.Dispose();
     }
-
+    */
     public static void MultiUserInfoReceived(byte[] _data)
     {
         ByteBuffer _buffer = new ByteBuffer();
@@ -143,8 +143,12 @@ public class ClientHandle : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-
+            string friendPlayFabID = _buffer.ReadString();
+            if(!PlayFabSample.Instance.OnlineFriends.Contains(friendPlayFabID))
+            PlayFabSample.Instance.OnlineFriends.Add(friendPlayFabID);
         }
+
+        _buffer.Dispose();
     }
 
     public static void AuthorizationRequested(byte[] _data)
