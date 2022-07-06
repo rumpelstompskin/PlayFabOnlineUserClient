@@ -131,7 +131,20 @@ public class ClientHandle : MonoBehaviour
 
         print($"Debug: {_response}");
         _buffer.Dispose();
+    }
 
+    public static void MultiUserInfoReceived(byte[] _data)
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteBytes(_data);
+        _buffer.ReadInt();
+
+        int count = _buffer.ReadInt();
+
+        for (int i = 0; i < count; i++)
+        {
+
+        }
     }
 
     public static void AuthorizationRequested(byte[] _data)

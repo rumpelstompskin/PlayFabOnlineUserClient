@@ -68,6 +68,22 @@ public class ClientSend : MonoBehaviour
         _buffer.Dispose();
     }
 
+    public void GetMultiUserOnlineStatus()
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteInt((int)ClientPackets.UserInfoRequestReceived);
+        int friendcount = PlayFabSample.Instance.FriendsPlayFabIDs.Count;
+        _buffer.WriteInt(friendcount);
+
+        foreach(var friend in PlayFabSample.Instance.FriendsPlayFabIDs)
+        {
+            _buffer.WriteString(friend);
+        }
+
+        SendDataToServer(_buffer.ToArray());
+        _buffer.Dispose();
+    }
+
     public void AuthorizeClient()
     {
         ByteBuffer _buffer = new ByteBuffer();

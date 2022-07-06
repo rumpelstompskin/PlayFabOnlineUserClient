@@ -18,6 +18,9 @@ public class PlayFabSample : MonoBehaviour
     [field: SerializeField, Tooltip("Certificate Name")]
     public string ServerName { get; set; } = default;
 
+    [field: SerializeField, Tooltip("List of all the friends of the user")]
+    public List<string> FriendsPlayFabIDs { get; set; } = new List<string>();
+
     private void Awake()
     {
         if(Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }
