@@ -32,6 +32,7 @@ public class ClientTCP : MonoBehaviour
     private void Awake()
     {
         if(Instance == null) { Instance = this; } else if(Instance != this) { Destroy(this); }
+        DontDestroyOnLoad(this);
     }
 
     private void Start()

@@ -8,15 +8,12 @@ using UnityEngine;
 public class ClientSend : MonoBehaviour
 {
     public static ClientSend Instance;
-
-    [field: SerializeField, Tooltip("Friend PlayFab ID used to request status")]
-    public string FriendPlayFabID { get; set; } = default;
-
+    
     private void Awake()
     {
         if (Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }
     }
-
+    
     public void SendDataToServer(byte[] _data)
     {
         try
@@ -72,12 +69,12 @@ public class ClientSend : MonoBehaviour
     {
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteInt((int)ClientPackets.UserInfoRequestReceived);
-        int friendcount = PlayFabSample.Instance.FriendsPlayFabIDs.Count;
+        int friendcount = PlayFabSample.Instance.FriendsUserData.Count;
         _buffer.WriteInt(friendcount);
 
-        foreach(var friend in PlayFabSample.Instance.FriendsPlayFabIDs)
+        foreach(var friend in PlayFabSample.Instance.FriendsUserData)
         {
-            _buffer.WriteString(friend);
+            _buffer.WriteString(friend.ID);
         }
 
         SendDataToServer(_buffer.ToArray());
@@ -91,6 +88,29 @@ public class ClientSend : MonoBehaviour
 
         _buffer.WriteString(ClientTCP.Instance.ServiceAuthorizationKey);
 
+        SendDataToServer(_buffer.ToArray());
+        _buffer.Dispose();
+    }
+
+    public void ClientSendFriendRequest(string userToSendTo)
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteInt((int)ClientPackets.FriendsRequestReceived);
+
+        _buffer.WriteString(userToSendTo);
+
+        SendDataToServer(_buffer.ToArray());
+        _buffer.Dispose();
+    }
+
+    public void ClientSendFriendResponse(string requestingUser, bool response)
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+
+        _buffer.WriteInt((int)ClientPackets.FriendsRequestResponseReceived);
+
+        _buffer.WriteBool(response);
+        _buffer.WriteString(requestingUser);
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }

@@ -13,12 +13,19 @@ public class ClientHandle : MonoBehaviour
 
     public delegate void Packet(byte[] data);
     public Dictionary<int, Packet> packets;
-
+    
     private void Awake()
     {
-        if(Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }
+        if(Instance != null && Instance != this) 
+        {
+            Destroy(this);
+        } else
+        {
+            Instance = this;
+        }
+        
     }
-
+    
     public void InitPackets()
     {
         Debug.Log("Initializing packets...");
@@ -26,7 +33,9 @@ public class ClientHandle : MonoBehaviour
         {
             { (int)ServerPackets.HandShake, HandShake },
             { (int)ServerPackets.UserInfoRequest, MultiUserInfoReceived },
-            { (int)ServerPackets.AuthorizeClient, AuthorizationRequested }
+            { (int)ServerPackets.AuthorizeClient, AuthorizationRequested },
+            { (int)ServerPackets.FriendRequest, FriendsRequestReceived },
+            { (int)ServerPackets.FriendResponse, FriendsRequestResponseReceived }
         };
     }
 
@@ -90,7 +99,7 @@ public class ClientHandle : MonoBehaviour
         }
     }
 
-    private static void HandShake(byte[] _data) // Initial handshake. Tells the client it has successfully connected.
+    private void HandShake(byte[] _data) // Initial handshake. Tells the client it has successfully connected.
     {
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
@@ -104,36 +113,8 @@ public class ClientHandle : MonoBehaviour
         ClientSend.Instance.HandShakeReceived();
         //ClientSend.Instance.AuthorizeClient();
     }
-    /*
-    public static void UserInfoReceived(byte[] _data)
-    {
-        string _response = string.Empty;
-        bool _status = false;
-        string _friendPlayFabID;
-        string _friendPlayFabNetworkID;
 
-        ByteBuffer _buffer = new ByteBuffer();
-        _buffer.WriteBytes(_data);
-        _buffer.ReadInt();
-
-        _status = _buffer.ReadBool();
-        _friendPlayFabID = _buffer.ReadString();
-        if (_status == true)
-        {
-            //User is online.
-            _friendPlayFabNetworkID = _buffer.ReadString();
-            _response = $"User: {_friendPlayFabID} Online Status: {_status} Network ID: {_friendPlayFabNetworkID}";
-        }
-        else
-        {
-            _response = $"User: {_friendPlayFabID} Online Status: {_status}";
-        }
-
-        print($"Debug: {_response}");
-        _buffer.Dispose();
-    }
-    */
-    public static void MultiUserInfoReceived(byte[] _data)
+    public void MultiUserInfoReceived(byte[] _data)
     {
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
@@ -144,16 +125,24 @@ public class ClientHandle : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             string friendPlayFabID = _buffer.ReadString();
-            if(!PlayFabSample.Instance.OnlineFriends.Contains(friendPlayFabID))
-            PlayFabSample.Instance.OnlineFriends.Add(friendPlayFabID);
+            foreach(UserData userData in PlayFabSample.Instance.FriendsUserData)
+            { // TODO See if we can remove this loop later.
+                if(userData.ID == friendPlayFabID)
+                {
+                    // User is online, add to currently online friends.
+                    if(!PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Contains(userData))
+                    {
+                        PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Add(userData);
+                    }
+                }
+            }
         }
-
         _buffer.Dispose();
+        Globals.OnFriendListUpdatedCallBack();
     }
 
-    public static void AuthorizationRequested(byte[] _data)
+    public void AuthorizationRequested(byte[] _data)
     {
-
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
@@ -161,5 +150,54 @@ public class ClientHandle : MonoBehaviour
         _buffer.Dispose();
         //ClientSend.Instance.HandShakeReceived();
         //print("Client is authorized...");
+    }
+
+    public void FriendsRequestReceived(byte[] _data)
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteBytes(_data);
+        _buffer.ReadInt();
+        string requestingFriendID = _buffer.ReadString();
+        string requestingFriendDisplayName = _buffer.ReadString();
+
+        UserData userData = new UserData(requestingFriendID, requestingFriendDisplayName);
+
+        if(!PlayFabSample.Instance.FriendsUserData.Contains(userData))
+        {
+            PlayFabSample.Instance.FriendsUserData.Add(userData);
+        }
+        /*
+        if (!PlayFabSample.Instance.FriendRequestPlayFabIDs.Contains(requestingFriendID))
+        {
+            PlayFabSample.Instance.FriendRequestPlayFabIDs.Add(requestingFriendID);
+        }
+        */
+        _buffer.Dispose();
+
+        // Received a friends request. Show friend request UI to user with data.
+        Globals.OnFriendRequestCallBack();
+    }
+
+    public void FriendsRequestResponseReceived(byte[] _data)
+    {
+        ByteBuffer _buffer = new ByteBuffer();
+        _buffer.WriteBytes(_data);
+        _buffer.ReadInt();
+
+        bool response = _buffer.ReadBool();
+        string responseFromUser = _buffer.ReadString();
+        string fromUserName = _buffer.ReadString();
+
+        if (response)
+        {
+            UserData userData = new UserData(responseFromUser, fromUserName);
+            if(!PlayFabSample.Instance.FriendsUserData.Contains(userData))
+            PlayFabSample.Instance.FriendsUserData.Add(userData);
+            //PlayFabSample.Instance.FriendsPlayFabIDs.Add(responseFromUser);
+        }
+        //print("User had added us to their friends list.");
+        // Take action depending on response. IE, Add friend on playfab or return error?
+        _buffer.Dispose();
+        Globals.OnFriendResponseCallBack();
     }
 }
