@@ -11,7 +11,16 @@ public class ClientSend : MonoBehaviour
     
     private void Awake()
     {
-        if (Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }
+       if(Instance != null && Instance != this)
+        {
+            Destroy(Instance);
+        } else
+        {
+            Instance = this;
+        }
+
+        //UnityMainThreadDispatcher.Instance().Enqueue
+        //(Logger.Instance.FindOrCreateLog());
     }
     
     public void SendDataToServer(byte[] _data)
@@ -33,18 +42,11 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// This is where the information is sent to the server. 
-    /// If we want to send other data. 
-    /// We can make a method similar to this one.
-    /// </summary>
-
     public void HandShakeReceived()
     {
+        Globals.OnConsoleUpdatedCallBack("Handshake confirmed, sending server our data...");
         ByteBuffer _buffer = new ByteBuffer(); 
         _buffer.WriteInt((int)ClientPackets.HandShakeReceived);
-
-        //_buffer.WriteBool(false);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabDisplayName);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabID);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabNetworkID);
@@ -52,19 +54,6 @@ public class ClientSend : MonoBehaviour
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }
-    /*
-    public void GetFriendOnlineStatus()
-    {
-        ByteBuffer _buffer = new ByteBuffer();
-        _buffer.WriteInt((int)ClientPackets.UserInfoRequestReceived);
-
-        //_buffer.WriteBool(true);
-        _buffer.WriteString(FriendPlayFabID);
-
-        SendDataToServer(_buffer.ToArray());
-        _buffer.Dispose();
-    }
-    */
     public void GetMultiUserOnlineStatus()
     {
         ByteBuffer _buffer = new ByteBuffer();
@@ -83,9 +72,10 @@ public class ClientSend : MonoBehaviour
 
     public void AuthorizeClient()
     {
+        Globals.OnConsoleUpdatedCallBack("Authorizing client's connection...");
+
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteInt((int)ClientPackets.AuthorizeClientReceived);
-
         _buffer.WriteString(ClientTCP.Instance.ServiceAuthorizationKey);
 
         SendDataToServer(_buffer.ToArray());
@@ -96,7 +86,6 @@ public class ClientSend : MonoBehaviour
     {
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteInt((int)ClientPackets.FriendsRequestReceived);
-
         _buffer.WriteString(userToSendTo);
 
         SendDataToServer(_buffer.ToArray());
@@ -106,11 +95,10 @@ public class ClientSend : MonoBehaviour
     public void ClientSendFriendResponse(string requestingUser, bool response)
     {
         ByteBuffer _buffer = new ByteBuffer();
-
         _buffer.WriteInt((int)ClientPackets.FriendsRequestResponseReceived);
-
         _buffer.WriteBool(response);
         _buffer.WriteString(requestingUser);
+
         SendDataToServer(_buffer.ToArray());
         _buffer.Dispose();
     }

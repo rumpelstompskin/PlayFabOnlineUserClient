@@ -16,11 +16,11 @@ public class FriendListing : MonoBehaviour
 
     public void InviteFriendToParty()
     {
-        // TODO
+        print("Attempting to invite friend to a party.");
     }
 
     public void RemoveFriend()
     {
-
+        print("Attempting to remove friend from friends list.");
     }
 }

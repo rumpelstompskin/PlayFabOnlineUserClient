@@ -23,7 +23,6 @@ public class ClientHandle : MonoBehaviour
         {
             Instance = this;
         }
-        
     }
     
     public void InitPackets()
@@ -101,6 +100,8 @@ public class ClientHandle : MonoBehaviour
 
     private void HandShake(byte[] _data) // Initial handshake. Tells the client it has successfully connected.
     {
+        Globals.OnConsoleUpdatedCallBack("Server has confirmed our handshake and welcomed us... " +
+            "Attempting to reply with user data...");
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
@@ -111,7 +112,6 @@ public class ClientHandle : MonoBehaviour
         Debug.Log("Message from server: " + _msg);
         ClientTCP.Instance.UserID = _myPlayerID;
         ClientSend.Instance.HandShakeReceived();
-        //ClientSend.Instance.AuthorizeClient();
     }
 
     public void MultiUserInfoReceived(byte[] _data)
@@ -124,32 +124,30 @@ public class ClientHandle : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            string friendDisplayName = _buffer.ReadString();
             string friendPlayFabID = _buffer.ReadString();
-            foreach(UserData userData in PlayFabSample.Instance.FriendsUserData)
-            { // TODO See if we can remove this loop later.
-                if(userData.ID == friendPlayFabID)
-                {
-                    // User is online, add to currently online friends.
-                    if(!PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Contains(userData))
-                    {
-                        PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Add(userData);
-                    }
-                }
+
+            UserData friendUserData = new UserData(friendPlayFabID, friendDisplayName);
+
+            if (!PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Contains(friendUserData))
+            {
+                PlayFabSample.Instance.CurrentlyOnlineFriendsUserData.Add(friendUserData);
             }
         }
+
         _buffer.Dispose();
         Globals.OnFriendListUpdatedCallBack();
     }
 
     public void AuthorizationRequested(byte[] _data)
     {
+        Globals.OnConsoleUpdatedCallBack("Receiving authorization key request from server... Attempting to reply...");
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();
+
         ClientSend.Instance.AuthorizeClient();
         _buffer.Dispose();
-        //ClientSend.Instance.HandShakeReceived();
-        //print("Client is authorized...");
     }
 
     public void FriendsRequestReceived(byte[] _data)
@@ -162,19 +160,13 @@ public class ClientHandle : MonoBehaviour
 
         UserData userData = new UserData(requestingFriendID, requestingFriendDisplayName);
 
-        if(!PlayFabSample.Instance.FriendsUserData.Contains(userData))
+        if(!PlayFabSample.Instance.RequestingFriendShipUserData.Contains(userData))
         {
-            PlayFabSample.Instance.FriendsUserData.Add(userData);
+            PlayFabSample.Instance.RequestingFriendShipUserData.Add(userData);
         }
-        /*
-        if (!PlayFabSample.Instance.FriendRequestPlayFabIDs.Contains(requestingFriendID))
-        {
-            PlayFabSample.Instance.FriendRequestPlayFabIDs.Add(requestingFriendID);
-        }
-        */
+
         _buffer.Dispose();
 
-        // Received a friends request. Show friend request UI to user with data.
         Globals.OnFriendRequestCallBack();
     }
 
@@ -193,11 +185,10 @@ public class ClientHandle : MonoBehaviour
             UserData userData = new UserData(responseFromUser, fromUserName);
             if(!PlayFabSample.Instance.FriendsUserData.Contains(userData))
             PlayFabSample.Instance.FriendsUserData.Add(userData);
-            //PlayFabSample.Instance.FriendsPlayFabIDs.Add(responseFromUser);
         }
-        //print("User had added us to their friends list.");
-        // Take action depending on response. IE, Add friend on playfab or return error?
+
         _buffer.Dispose();
+
         Globals.OnFriendResponseCallBack();
     }
 }

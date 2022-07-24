@@ -14,15 +14,33 @@ public class FriendRequestPanel : MonoBehaviour
     [field: SerializeField, Tooltip("Display name of requesting user")]
     public string RequestingUserDisplayName { get; set; } = default;
 
+    public UserData userData = default;
+
+    public SendFriendRequestPanel requestPanel { get; set; } = default;
+
     public void AcceptFriendRequest()
     {
-        ClientSend.Instance.ClientSendFriendResponse(RequestingPlayFabID, true);
-        Destroy(gameObject);
+        ClientSend.Instance.ClientSendFriendResponse(userData.ID, true);
+        AcceptDeclineFriendRequest();
     }
 
     public void DeclineFriendRequest()
     {
-        ClientSend.Instance.ClientSendFriendResponse(RequestingPlayFabID, false);
+        ClientSend.Instance.ClientSendFriendResponse(userData.ID, false);
+        AcceptDeclineFriendRequest();
+    }
+
+    private void AcceptDeclineFriendRequest()
+    {
+        requestPanel.FriendRequestShown = false;
+        PlayFabSample.Instance.FriendsUserData.Add(userData);
+        PlayFabSample.Instance.RequestingFriendShipUserData.Remove(userData);
+        requestPanel.InProgressFriendRequest.Remove(userData);
+        requestPanel.InProgressFriendRequest.TrimExcess();
+        if (requestPanel.InProgressFriendRequest.Count > 0)
+        {
+            requestPanel.ProcessFriendRequest(requestPanel.InProgressFriendRequest[0]);
+        }
         Destroy(gameObject);
     }
 

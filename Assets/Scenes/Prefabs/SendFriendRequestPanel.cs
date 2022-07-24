@@ -20,6 +20,8 @@ public class SendFriendRequestPanel : MonoBehaviour
 
     public List<UserData> InProgressFriendRequest = new List<UserData>();
 
+    public bool FriendRequestShown = false;
+
     public void SendFriendRequestToPlayFabID()
     {
         print($"Requesting friendship with playerID {InputField.text}");
@@ -39,19 +41,42 @@ public class SendFriendRequestPanel : MonoBehaviour
 
     public IEnumerator UpdateFriendRequests()
     {
-        foreach(var userData in PlayFabSample.Instance.FriendsUserData)
+        foreach(var userData in PlayFabSample.Instance.RequestingFriendShipUserData)
         {
             if (InProgressFriendRequest.Contains(userData))
             {
                 continue;
             }
-
             InProgressFriendRequest.Add(userData);
             RequestingUserPlayFabID = userData.ID;
             RequestingUserDisplayName = userData.Name;
-            ProcessFriendRequestTest();
+
+            ProcessFriendRequest(userData);
         }
         yield return null;
+    }
+
+    public void ProcessFriendRequest(UserData userData)
+    {
+        if(InProgressFriendRequest.Count > 0 && 
+            !PlayFabSample.Instance.FriendsUserData
+            .Contains(userData))
+        // Only run if we have friend requests in queue and we arn't already friends.
+        {
+            if(FriendRequestShown == false) // We currently are not processing any friend request.
+            {
+                FriendRequestShown = true;
+                GameObject requestPanel = Instantiate(RequestPanel, transform.parent);
+                if (requestPanel.TryGetComponent(out FriendRequestPanel friendRequestPanel))
+                {
+                    friendRequestPanel.requestPanel = this;
+                    friendRequestPanel.userData = userData;
+                    friendRequestPanel.RequestingPlayFabID = userData.ID;
+                    friendRequestPanel.RequestingUserDisplayName = userData.Name;
+                    friendRequestPanel.UserDisplayName.text = userData.Name;
+                }
+            }
+        }
     }
 
     public void ProcessFriendRequestTest()

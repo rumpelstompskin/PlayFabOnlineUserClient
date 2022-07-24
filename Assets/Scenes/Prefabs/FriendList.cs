@@ -10,6 +10,8 @@ public class FriendList : MonoBehaviour
     [field: SerializeField, Tooltip("Friend Listing Prefab reference"), Header("Prefabs")]
     public GameObject FriendListingPrefab { get; private set; } = default;
 
+    public HashSet<UserData> OnlineFriendsListing = new HashSet<UserData>();
+
     private void OnEnable()
     {
         Globals.OnFriendListUpdated += OnFriendListUpdated;
@@ -22,9 +24,13 @@ public class FriendList : MonoBehaviour
 
     public IEnumerator OnFriendListUpdated()
     {
-        // TODO User just refreshed their friends list.
         foreach(var onlineFriend in PlayFabSample.Instance.CurrentlyOnlineFriendsUserData)
         {
+            if (OnlineFriendsListing.Contains(onlineFriend))
+            {
+                continue;
+            }
+            OnlineFriendsListing.Add(onlineFriend);
             GameObject listing = Instantiate(FriendListingPrefab, ContentGO.transform);
             if(listing.TryGetComponent(out FriendListing friendListing))
             {
@@ -32,7 +38,6 @@ public class FriendList : MonoBehaviour
                 friendListing.FriendDisplayName = onlineFriend.Name; // TODO Call PlayFab API to retrieve user's display name
                 friendListing.FriendDisplayNameReference.text = onlineFriend.Name; // TODO
             }
-            // TODO Expand the content window.
         }
         yield return null;
     }

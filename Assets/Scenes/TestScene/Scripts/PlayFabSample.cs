@@ -7,11 +7,6 @@ public struct UserData
     public string Name;
     public string ID;
 
-    public UserData(string id)
-    {
-        ID = id;
-        Name = null;
-    }
     public UserData(string id, string name)
     {
         Name = name;
@@ -47,7 +42,7 @@ public class PlayFabSample : MonoBehaviour
     /// List containing user data from friendship requesting users.
     /// </summary>
     public List<UserData> RequestingFriendShipUserData { get; set; } = new List<UserData>();
-
+    /*
     [field: SerializeField, Tooltip("List of all the friends of the user")]
     public List<string> FriendsPlayFabIDs { get; set; } = new List<string>();
 
@@ -56,8 +51,7 @@ public class PlayFabSample : MonoBehaviour
 
     [field: SerializeField, Tooltip("List of Friend Request by PlayFabID")]
     public List<string> FriendRequestPlayFabIDs { get; set; } = new List<string>();
-
-    
+    */
     private void Awake()
     {
         if(Instance == null) { Instance = this; } else if (Instance != this) { Destroy(this); }

@@ -34,11 +34,12 @@ public class ClientTCP : MonoBehaviour
         if(Instance == null) { Instance = this; } else if(Instance != this) { Destroy(this); }
         DontDestroyOnLoad(this);
     }
-
+    /*
     private void Start()
     {
         ConnectToServer();
     }
+    */
 
     private void OnDisable()
     {
@@ -80,7 +81,7 @@ public class ClientTCP : MonoBehaviour
             stream = socket.GetStream();
             sslStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CertificateValidationCallback), null);
             
-            sslStream.AuthenticateAsClient(PlayFabSample.Instance.ServerName); // TODO Change to proper name
+            sslStream.AuthenticateAsClient(PlayFabSample.Instance.ServerName);
 
             sslStream.BeginRead(receiveBuffer, 0, socket.ReceiveBufferSize, ReceivedData, null);
         }
@@ -121,7 +122,7 @@ public class ClientTCP : MonoBehaviour
         }
         catch (Exception _ex)
         {
-            Console.WriteLine($"Error while receiving data: {_ex}");
+            Debug.Log($"Error while receiving data: {_ex}");
             CloseConnection();
             return;
         }
