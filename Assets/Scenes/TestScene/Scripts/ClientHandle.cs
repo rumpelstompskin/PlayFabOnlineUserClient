@@ -141,7 +141,7 @@ public class ClientHandle : MonoBehaviour
 
     public void AuthorizationRequested(byte[] _data)
     {
-        Globals.OnConsoleUpdatedCallBack("Receiving authorization key request from server... Attempting to reply...");
+        Globals.OnConsoleUpdatedCallBack("Receiving authorization request from server... Attempting to reply...");
         ByteBuffer _buffer = new ByteBuffer();
         _buffer.WriteBytes(_data);
         _buffer.ReadInt();

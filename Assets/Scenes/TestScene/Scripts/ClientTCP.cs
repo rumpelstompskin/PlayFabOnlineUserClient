@@ -73,7 +73,7 @@ public class ClientTCP : MonoBehaviour
         }
         
 
-        if (!socket.Connected) { print("Service offline..."); return; } // TODO Return error to the user.
+        if (!socket.Connected) { Globals.OnConsoleUpdatedCallBack("Service offline..."); return; } // TODO Return error to the user.
 
         else
         {
@@ -97,7 +97,7 @@ public class ClientTCP : MonoBehaviour
             if(sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors || certificate.Subject == certificate.Issuer)
             {
                 if (chain.ChainStatus[0].Status == X509ChainStatusFlags.UntrustedRoot)
-                {
+                { // Client can connect to any ssl connection that are self-signed. Potential security risk. Consider getting proper certificate to remove this.
                     return true;
                 }
             }

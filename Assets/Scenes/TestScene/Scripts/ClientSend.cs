@@ -18,9 +18,6 @@ public class ClientSend : MonoBehaviour
         {
             Instance = this;
         }
-
-        //UnityMainThreadDispatcher.Instance().Enqueue
-        //(Logger.Instance.FindOrCreateLog());
     }
     
     public void SendDataToServer(byte[] _data)
@@ -45,6 +42,7 @@ public class ClientSend : MonoBehaviour
     public void HandShakeReceived()
     {
         Globals.OnConsoleUpdatedCallBack("Handshake confirmed, sending server our data...");
+        
         ByteBuffer _buffer = new ByteBuffer(); 
         _buffer.WriteInt((int)ClientPackets.HandShakeReceived);
         _buffer.WriteString(PlayFabSample.Instance.PlayFabDisplayName);
